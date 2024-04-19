@@ -1,0 +1,27 @@
+Documentation
+
+The program for myweb.c works by having the user enter a website as the first argument and then
+having the second argument contain the IP address, an optional port number and a possible file path. 
+The second argument is parsed through to recieve each part of the information and is used to connect to 
+the server with either GET or HEAD so that the client will be able to read the information from the server
+after writing to it. 
+
+The first test I used was with the given example of /myweb www.example.com 93.184.216.34:80/index.html 
+and the result produced the body of the HTTP request placed into output.dat. Adding the -H flag will
+print out the header for the response. 
+
+The second test that I performed with similar results is ./myweb www.neverssl.com 34.223.124.45/. This didn't
+have a port number so it defaulted to 80 and had no additional file path. This command would print out the body
+to the output file without the header. 
+
+The next test was using the command of ./myweb www.testingmcafeesites.com 18.236.36.28/ and produced
+a larger output to the file than the other ones. Although, it did successfully print out the body without the 
+header. In addition, it didn't need a file path or port number to successfully connect to write or read from.
+
+The fourfth test, as the other tests were from, was from the lab document and tested the response to the website
+./myweb pudim.com.br 54.207.20.104/. It is a bit more unusual with the extra .br and subtle differences
+compared to the other tests, but was still able to produce the expected output.
+
+The last site that I tested was for ./myweb www.facebook.com 157.240.22.35/ -h and it was able to print out the
+header, which contained the 301 status code. 
+

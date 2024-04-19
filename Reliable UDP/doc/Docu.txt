@@ -1,0 +1,51 @@
+Documentation
+
+The program for myclient and myserver work by making use of the UDP protocol, making it a
+connectionless, unreliable, datagram protocol. The client and server both create a socket and
+operate similiarliy to eachother. The client doesn't make a connection with the 
+server, but instead sends a datagram to the server using sendto, which needs the address
+of the server. The server also does not need a connection, but calls recvfrom, which waits 
+until the data from the client arrives. The server is left to run so that it can continue to 
+receive and send back packets that other clients send to it. Once the client sends the data out, it
+can then reassemble it back. In the case of this program, the client will send out the data
+contained in a file in the form of packets defined by the amount of bytes and they server will 
+make a copy of it at the server side. This will also utilize a way to reliably send the packets
+by using a Selective Repeat. This will make a window size that will determine how many packets
+will be sent and acknowledged.
+
+My plan for Selective Repeat was to first accept the window size from the client give by the user. Then, 
+to have the client transmit a number of packets based on the window size without waiting for an acknowledgement 
+for each individual packet to the server. The server will acknowledge each packet that is successfully received, 
+and the client will keep track of which packets have been successfully received by the receiver.
+The server will also have a buffer to hold packets that are received out of order. When the packet is successfully 
+received, the server will send an acknowledgement to the client to show that the packet has been received. The acknowledgement 
+message will tell the sequence number of the packet received, as well as an acknowledgement number for the 
+next expected sequence number. In the event that a packet is lost or damaged, the client will
+retransmit the lost packet.
+
+
+Part of the 5 tests that I used to test my program was first by creating an input file and writing
+random words into it. This would test if my program would be able to read and write all of the
+data that it sent to the server to print to the outfile. This would make sure that the data was being
+sent correctly so that the server can create a copy into it and also check the packets are being fully sent over.
+
+Another test that I used was to create the output file in another directory so that the output can be
+placed anywhere. Although, I used the $HOME variable, which requires placing the entire path 
+that the output file should be in. This was slightly challenging for me to fully get because there
+wasn't much clarity regarding how the input for the paths would be like.
+
+Some tests that I ran were sending a large file into the client to see how long it would take for 
+all of the packets to be sent through. It took a while to send, but also found that my implementation
+was incorrect as some of the data wasn't able to be fully sent over. I tried different methods and 
+used print statements to make sure that my packets weren't being dropped when sent. 
+
+Since I couldn't get my program to work 100%, I tested some features specifically and one of them was to
+change the window size when sending data over. This was used to make sure that in the even of packet loss
+that the program is aware of either sequence numbers or ack being dropped. This would be used to ensure that
+the data can be recovered and resent when needed so the file can be reconstructed at the server.
+
+The last test that I tried to work around with was to independently change the amount of dropped packets from the
+server. I tried to create a function that allow for a certain percentage of the packets being sent over to be dropped
+so that it can let the client know as a way to test for resending protocols. This worked well as a function on its own, but 
+I wasn't able to fully incorporate it correctly into the rest of my program. Also, as I couldn't get my program to fully
+work, I wasn't able to produce a graph of the sequence numbers vs ack numbers based on the client log.

@@ -1,0 +1,49 @@
+Documentation
+
+The program for was to create a client to server proxy that can convert HTTP requests
+from clients and convert them to HTTPS requests to the web server. The proxy will support 
+requests from clients and will parse the header of the HTTP requests to decide if they should be 
+sent to the server based on the control file provided. 
+
+The way I have implemented it is that I first create a listening socket so that the user entered port
+can be opened there. This allows for the socket to be binded there so that the client can connect
+to it. Once it is binded and starts listening, I create a while loop so that the server can stay open
+for clients to connect to. In this loop, I listen for clients that connect and create threads for them 
+so that they can run concurrently. In each thread, I parse through the HTTP request and get the information
+needed to connect to the server. I also check the hostname and ip with the forbidden list to see if it is 
+allowed. 
+
+The first test that I ran was using curl -x http://localhost:9006 http://www.example.com to see if I could 
+connect to it. Initially, I was unable to connect, but I used checks to make sure I was able to get the 
+address from the hostname and when I was, I tried to receive the HTTPS response from the server. When I was able
+to, I was able to write to the access.log the infromation needed for the interaction between client and server.
+
+The second test was using another curl command for curl -x http://localhost:9004 http://ucsc.edu. I wanted to 
+use another site and this one was slightly different because it is a .edu page, so I wanted to check that In
+got the proper response for it. After running it and printing the response from the server, I was able to receive
+the page for it and send it back to the client. I got an http 301 response, but the example had 200, so I wasn't sure
+if we should have changed it.
+
+The third test I went for was curl -x http://localhost:9004 http://www.youtube.com, but I tested the forbiddenlist
+to make sure I was parsing through it and checking if it was inside. For the first time, I kept it off the list and
+ran it to make sure that it would work since there is nothing stopping the connection from the client to the server. 
+Next I wrote the host name because it was brought it up in the example of the lab manual and it was able to stop it
+from sending. On top of that, I was able to send a response back to the client to make sure it understood what went
+wrong by sending the error code. I repreated this test by placing the ip of the server into the list and seeing if it would
+cause the error. At first it couldn't, but I was eventually able to get the ip of the server and create the error as needed.
+
+For the fourth test, I tested my threads to make sure that I was able to run each client concurrently and that it wouldn't
+cause problems for either connection. After I implemented the thread section, I tried to run two clients and have them connect
+to the proxy server at the same time. At first, I was able to get the first client to work, but the second one wasn't 
+connecting to the server. I later found out that I forgot to close some sockets and that I had to add a mutex so that each
+thread can run independently, which worked because each client was able to receive the desired response. 
+
+The last test I used wget -p http://www.reddit.com/ as a precaution to make sure that using other methods would
+work with my program. Reddit was a lengthy response that I hadn't accounted for when reading the response from the
+buffer, so I increased the size of my receive buffer to make sure all of the data can be placed in there. Using this allowed
+me to send the full response back to the client and log the amount of bytes it had received. 
+
+Some shortcomings for my lab was that I wasn't able to implement the update to the forbidden list with SiGINT. I had an 
+understanding to use signals and then I had a function to act when the signal came through, but it was not able to
+work properly. I was also unable to fully implement a way to resolve the error if the connection is broken in the middle of
+the transfer. 

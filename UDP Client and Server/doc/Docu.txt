@@ -1,0 +1,42 @@
+Documentation
+
+The program for myclient and myserver work by making use of the UDP protocol, making it a
+connectionless, unreliable, datagram protocol. The client and server both create a socket and
+operate similiarliy to eachother. The client doesn't make a connection with the 
+server, but instead sends a datagram to the server using sendto, which needs the address
+of the server. The server also does not need a connection, but calls recvfrom, which waits 
+until the data from the client arrives. The server is left to run so that it can continue to 
+receive and send back packets that other clients send to it. Once the client sends the data out, it
+can then reassemble it back. In the case of this program, the client will send out the data
+contained in a file to the server and receive a response to be able to write back that data 
+into a seperate file. This allows the file to be echoed and create an identical copy of the file
+sent out. 
+
+The 5 tests that I used to test my program was first by creatingn an input file and writing
+random words into it. This would test if my program would be able to read and write all of the
+data that it sent to the server. I had a few issues when understanding how to implement the
+functionality of using either a file or using subdirectories. The lab manual also didn't specify
+what kind of example directory it would be so I had worked with having the output in the same directory. 
+
+Another test that I used was to create the output file in another directory so that the output can be
+placed anywhere. Although, I used the $HOME variable, which requires placing the entire path 
+that the output file should be in. This was slightly challenging for me to fully get because there
+wasn't much clarity regarding how the input for the paths would be like.
+
+The next test case that I used was to alter the mtu to make sure that I wasn't sending extra data to the
+server. This was because the amount of packets that is suppose to be sent to the server is defined by
+the filesize divivded by the mtu minus the overhead. This would keep sending until the client finished
+sending all of the data. Unfortunately, I wasn't able to properly get it to work and instead sends the mtu
+amount to the server and to return back to the client. 
+
+The fourfth test case I used was to change the port number to make sure that the port was able to send
+to the server. This also requires the server to open with the same port number so that they can connect, with 
+the client also having the ip address of the server. I was able to get this to work fairly well, but was 
+initially confused on what the server address for the unix time share would be.
+
+The last test that I used was to send large files to send through the server and return back to the client 
+to echo it. I found the issue that some parts of data would be missing and wouldn't be able to fully replicate 
+the input file that I was using. I figured that it was because the traversal of packets casued them to be 
+unordered, so I had to reorder them. My thought was to use a sequence number and place them on each packet so when
+each of them were sent out and received back, it could be resorted into its proper sequence of numbers
+to recreate the file.

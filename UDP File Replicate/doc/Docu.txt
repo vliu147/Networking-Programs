@@ -1,0 +1,57 @@
+Documentation
+
+The program for my client and myserver work by making use of the UDP protocol,  The client and server both create a socket and
+operate similiarliy to eachother. The client doesn't make a connection with the 
+server, but instead sends a datagram to the server using sendto, which needs the address
+of the server. The client works first by taking the the arguments that the user gives in the command line.
+It then opens the server.config file for reading because it contains the port and address of the servers
+that we wil want to be connecting to. Then for each server, I will create a thread so that they can be
+connected simultaneously and each server can connect to the client. I also place important information
+into a struct so that they can be retreived in the thread function. In the function, I first start by
+locking my thread so that each thread that connects can wait for others to finish before they can start
+theirs. Then, I open the file to read from, while also connecting to the server based on the port and address
+given in the server.config file. When the server is binded to the client, I send the outfile path given as 
+as argument so that the server can use it to decide where the recreated fiel will end up. I then send packets
+based on the window size so that the server can catch them and then try to receive the Acks sent from the server
+back to the client to make sure the packets were all sent. 
+
+My plan for Selective Repeat was to first accept the window size from the client give by the user. Then, 
+to have the client transmit a number of packets based on the window size and sending the packet with a SN to
+each individual packet to the server. The server will acknowledge each packet that is successfully received, 
+and the client will keep track of which packets have been successfully received by the receiver.
+The server will also have a buffer to hold packets that are received out of order. When the packet is successfully 
+received, the server will send an acknowledgement to the client to show that the packet has been received. The acknowledgement 
+message will tell the sequence number of the packet received, as well as an acknowledgement number for the 
+next expected sequence number. In the event that a packet is lost or damaged, the client will
+retransmit the lost packet.
+
+Part of the 5 tests that I used to test my program was first by creating an input file and writing
+random words into it. This would test first that each server can be opened to at the same time by 
+starting the server and having the client send to it. With the file, I was able to send all of the packets
+and each server was able to print them out. Also, I was able to receive responses from them by getting 
+a response from each server. 
+
+Another test that I used was to test the connection of servers and handle the errors that came with them, such
+as putting more servers in the serv.config file than were actually open. This led to the client running
+indefenitely because it couldn't find a connection, so I remembered to add a timeout to my program. I made it
+10 seconds so that if the same scenario happened again or if for some reason the server can't connect in that
+time, it would automatically timeout the client.
+
+Some tests that I ran were sending a large file into the client to see how long it would take for 
+all of the packets to be sent through. It took a while to send, but also found that my implementation
+was incorrect as some of the data wasn't able to be fully sent over. I tried different methods and 
+used print statements to make sure that my packets weren't being dropped when sent. 
+
+Since I couldn't get my program to work exactly as expected, I tested some features specifically and one of them was to
+make sure that the packets were all sending and receiving from the right server. Since I handled the threads correctly, I
+was able to see the process of each server at a time because they have to wait for each other. Using this, I was able to check for 
+errors by changing the addresses, changing the mtu and window size and the number of servers to deal with potential errors that came
+up as I was running tests. 
+
+The last test that I tried to work around with was to independently change the amount of dropped packets from the
+server. I tried to create a function that allow for a certain percentage of the packets being sent over to be dropped
+so that it can let the client know as a way to test for resending protocols. This worked somewhat well, but 
+I wasn't able to fully incorporate it correctly into the rest of my program. Also, as I couldn't get my program to fully
+work, I wasn't able to produce a graph of the sequence numbers vs ack numbers based on the client log in the event of 
+dropped packets, but I made one for non-dropped packets. There were some shortcomings that I couldn't fully accomplish, such as 
+getting the retransmission to fully work with the window size and using the dropped argument in the server to drop packets.
